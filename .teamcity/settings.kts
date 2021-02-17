@@ -4,6 +4,7 @@ import jetbrains.buildServer.configs.kotlin.v2018_2.*
 //import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.swabra
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
+import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
 //import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
@@ -71,15 +72,15 @@ object QADeploy : BuildType({
         root(AndreasSpringPetclinicTeamcityDsl)
     }
     steps {
-        DeployBuildStep("CI-RS", "ci-rs")
-        DeployBuildStep("PP-RS", "pp-rs")
-
+        step(DeployBuildStep("CI-RS", "ci-rs"))
+        step(DeployBuildStep("PP-RS", "pp-rs"))
     }
     triggers {
         vcs {
         }
     }
 })
+
 
 class DeployBuildStep(private val envName: String, private val env: String) : ScriptBuildStep({
     name = "Deploy to $envName"
