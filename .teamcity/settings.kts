@@ -37,8 +37,10 @@ version = "2020.1"
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
-    buildType(QADeploy)
+    buildType(OtplDeploy("CI-RS", "ci-rs"))
 
+
+    buildType(OtplDeploy("PP-RS", "pp-rs"))
 }
 
 object BuildAndTest : BuildType({
@@ -65,32 +67,25 @@ object BuildAndTest : BuildType({
     }
 })
 
-object QADeploy : BuildType({
-    name = "QA Deploy"
+
+class OtplDeploy(private val envName: String, private val env: String) : BuildType({
+    name = "otpl deploy to $envName"
 
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
     steps {
-        step(DeployBuildStep("CI-RS", "ci-rs"))
-        step(DeployBuildStep("PP-RS", "pp-rs"))
-    }
-    triggers {
-        vcs {
+        script {
+            name = "otpl deploy to $envName"
+            scriptContent = "otpl-deploy -u $env %otpl-build-tag%"
+
+            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
+            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
+            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
         }
     }
 })
 
-
-class DeployBuildStep(private val envName: String, private val env: String) : ScriptBuildStep({
-    name = "Deploy to $envName"
-    scriptContent = "otpl-deploy -u $env %opl-build-tag%"
-
-    param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
-    param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
-    param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
-
-})
 
 object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     name = "andreas-spring-petclinic-teamcity-dsl"
