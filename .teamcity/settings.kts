@@ -55,7 +55,7 @@ object Build : BuildType({
 })
 
 object RepoVcs : GitVcsRoot({
-    name = "andreas-spring-petclinic-tc"
+    name = "andreas-spring-petclinic-teamcity-dsl"
     url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
     authMethod = uploadedKey {
         uploadedKey = "guestcenter-tc"
