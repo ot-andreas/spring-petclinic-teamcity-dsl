@@ -34,34 +34,27 @@ version = "2020.1"
 
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
-    buildType(Build)
+    buildType(BuildAndTest)
+
 }
 
-object Build : BuildType({
-    name = "Build"
-    artifactRules = "target/*jar"
+object BuildAndTest : BuildType({
+    name = "Build & Test"
 
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
     steps {
         maven {
-            goals = "clean install"
+            goals = "clean verify"
             dockerImage = "maven:3.6.0-jdk-8"
         }
 
         maven {
-            goals = "clean package"
+            goals = "clean deploy"
             dockerImage = "maven:3.6.0-jdk-8"
         }
 
-        script {
-            name = "tester"
-            scriptContent = "echo 1"
-            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
-            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
-            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
-        }
     }
     triggers {
         vcs {
