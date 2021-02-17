@@ -43,17 +43,15 @@ object Build : BuildType({
     }
     steps {
         maven {
+            goals = "clean install"
+            dockerImage = "maven:3.6.0-jdk-8"
+        }
+
+        maven {
             goals = "clean package"
             dockerImage = "maven:3.6.0-jdk-8"
         }
 
-        script {
-            name = """Hello World\"""
-            scriptContent = """echo "hey there!""""
-            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
-            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
-            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
-        }
     }
     triggers {
         vcs {
