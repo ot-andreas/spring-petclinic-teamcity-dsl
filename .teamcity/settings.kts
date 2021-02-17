@@ -35,12 +35,18 @@ version = "2020.1"
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
+    buildType(DeployBuildType("CI-RS", "ci-rs"))
+    buildType(DeployBuildType("CI-RS", "ci-rs"))
+    buildType(DeployBuildType("PP-RS", "pp-rs"))
 
 }
 
 object BuildAndTest : BuildType({
     name = "Build & Test"
 
+    vcs {
+        root(AndreasSpringPetclinicTeamcityDsl)
+    }
     steps {
         maven {
             name = "Verify"
@@ -55,6 +61,23 @@ object BuildAndTest : BuildType({
     }
     triggers {
         vcs {
+        }
+    }
+})
+
+class DeployBuildType(val envName: String, val env: String) : BuildType({
+    vcs {
+        root(AndreasSpringPetclinicTeamcityDsl)
+    }
+
+    steps {
+        script {
+            name = "Deploy to $envName"
+            scriptContent = "otpl-deploy -u $env %opl-build-tag%"
+
+            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
+            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
+            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
         }
     }
 })
