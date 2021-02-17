@@ -30,7 +30,7 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 version = "2020.1"
 
 project {
-    vcsRoot(RepoVcs)
+    vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(Build)
 }
 
@@ -54,14 +54,13 @@ object Build : BuildType({
     }
 })
 
-object RepoVcs : GitVcsRoot({
+object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     name = "andreas-spring-petclinic-teamcity-dsl"
     url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
     authMethod = uploadedKey {
         uploadedKey = "guestcenter-tc"
     }
 })
-
 
 fun wrapWithFeature(buildType: BuildType, featureBlock: BuildFeatures.() -> Unit): BuildType {
     buildType.features {
