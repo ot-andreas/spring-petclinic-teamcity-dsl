@@ -39,7 +39,7 @@ object Build : BuildType({
     artifactRules = "target/*jar"
 
     vcs {
-        root(RepoVcs)
+        root(AndreasSpringPetclinicTeamcityDsl)
     }
     steps {
         maven {
