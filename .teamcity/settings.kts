@@ -1,12 +1,12 @@
 
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
-import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.Swabra
-import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.swabra
+//import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.Swabra
+//import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.swabra
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
-import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
+//import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
 
 
 /*
@@ -36,7 +36,7 @@ version = "2020.1"
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
-    buildType(QADeploy("CI-RS", "ci-rs"))
+    buildType(QADeploy)
 
 }
 
@@ -81,7 +81,7 @@ object QADeploy : BuildType({
     }
 })
 
-class DeployBuildStep(val envName: String, val env: String) : ScriptBuildStep({
+class DeployBuildStep(private val envName: String, private val env: String) : ScriptBuildStep({
     name = "Deploy to $envName"
     scriptContent = "otpl-deploy -u $env %opl-build-tag%"
 
@@ -99,9 +99,9 @@ object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     }
 })
 
-fun wrapWithFeature(buildType: BuildType, featureBlock: BuildFeatures.() -> Unit): BuildType {
-    buildType.features {
-        featureBlock()
-    }
-    return buildType
-}
+//fun wrapWithFeature(buildType: BuildType, featureBlock: BuildFeatures.() -> Unit): BuildType {
+//    buildType.features {
+//        featureBlock()
+//    }
+//    return buildType
+//}
