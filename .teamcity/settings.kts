@@ -2,6 +2,7 @@
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.Swabra
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.swabra
+import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
@@ -35,9 +36,7 @@ version = "2020.1"
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
-    buildType(DeployBuildType("CI-RS", "ci-rs"))
-    buildType(DeployBuildType("CI-RS", "ci-rs"))
-    buildType(DeployBuildType("PP-RS", "pp-rs"))
+    buildType(QADeploy("CI-RS", "ci-rs"))
 
 }
 
@@ -65,21 +64,31 @@ object BuildAndTest : BuildType({
     }
 })
 
-class DeployBuildType(val envName: String, val env: String) : BuildType({
+object QADeploy : BuildType({
+    name = "QA Deploy"
+
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
-
     steps {
-        script {
-            name = "Deploy to $envName"
-            scriptContent = "otpl-deploy -u $env %opl-build-tag%"
+        DeployBuildStep("CI-RS", "ci-rs")
+        DeployBuildStep("PP-RS", "pp-rs")
 
-            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
-            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
-            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
+    }
+    triggers {
+        vcs {
         }
     }
+})
+
+class DeployBuildStep(val envName: String, val env: String) : ScriptBuildStep({
+    name = "Deploy to $envName"
+    scriptContent = "otpl-deploy -u $env %opl-build-tag%"
+
+    param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
+    param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
+    param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
+
 })
 
 object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
