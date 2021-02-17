@@ -27,10 +27,10 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 'Debug' option is available in the context menu for the task.
 */
 
-version = "2018.2"
+version = "2020.1"
 
 project {
-    vcsRoot(PetclinicVcs)
+    vcsRoot(RepoVcs)
     buildType(Build)
 }
 
@@ -39,7 +39,7 @@ object Build : BuildType({
     artifactRules = "target/*jar"
 
     vcs {
-        root(PetclinicVcs)
+        root(RepoVcs)
     }
     steps {
         maven {
@@ -58,9 +58,12 @@ object Build : BuildType({
     }
 })
 
-object PetclinicVcs : GitVcsRoot({
-    name = "PetclinicVcs"
-    url = "https://github.com/spring-projects/spring-petclinic.git"
+object RepoVcs : GitVcsRoot({
+    name = "andreas-spring-petclinic-tc"
+    url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
+    authMethod = uploadedKey {
+        uploadedKey = "guestcenter-tc"
+    }
 })
 
 
