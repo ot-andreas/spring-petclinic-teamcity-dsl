@@ -47,12 +47,10 @@ object BuildAndTest : BuildType({
     steps {
         maven {
             goals = "clean verify"
-            dockerImage = "maven:3.6.0-jdk-8"
         }
 
         maven {
             goals = "clean deploy"
-            dockerImage = "maven:3.6.0-jdk-8"
         }
 
     }
