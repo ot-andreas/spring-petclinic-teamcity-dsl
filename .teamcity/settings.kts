@@ -41,15 +41,14 @@ project {
 object BuildAndTest : BuildType({
     name = "Build & Test"
 
-    vcs {
-        root(AndreasSpringPetclinicTeamcityDsl)
-    }
     steps {
         maven {
+            name = "Verify"
             goals = "clean verify"
         }
 
         maven {
+            name = "Build Snapshot"
             goals = "clean deploy"
         }
 
