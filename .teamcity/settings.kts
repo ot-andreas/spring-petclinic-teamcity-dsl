@@ -54,7 +54,6 @@ object Build : BuildType({
     }
     triggers {
         vcs {
-            groupCheckinsByCommitter = true
         }
     }
 })
