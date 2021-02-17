@@ -46,6 +46,11 @@ object Build : BuildType({
             goals = "clean package"
             dockerImage = "maven:3.6.0-jdk-8"
         }
+
+        script {
+            name = "Print Hello world"
+            scriptContent = "echo 'Hello World'"
+        }
     }
     triggers {
         vcs {
