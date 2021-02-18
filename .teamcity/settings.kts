@@ -151,7 +151,7 @@ object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     authMethod = uploadedKey {
         uploadedKey = "guestcenter-tc"
     }
-    branchSpec = "+:refs/pull/*/merge"
+    branchSpec = "+:refs/pull/*/merge\n+:refs/pull/*/from\n"
 })
 
 //fun wrapWithFeature(buildType: BuildType, featureBlock: BuildFeatures.() -> Unit): BuildType {
