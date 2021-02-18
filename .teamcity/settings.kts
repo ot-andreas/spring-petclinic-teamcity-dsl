@@ -67,7 +67,7 @@ object BuildAndTest : BuildType({
 })
 
 class OtplDeploy(private val envName: String, private val env: String) : BuildType({
-    id("PetClinic-$env-OTPL-Deploy")
+    id("PetClinic_${env}_OTPL_Deploy")
     name = "otpl deploy to $envName"
 
     vcs {
@@ -90,7 +90,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
         Environment.CI_RS -> "K8sDeploymentCentralCiRs"
         Environment.PP_RS -> "K8sDeploymentCentralPpRs"
     }))
-    id("PetClinic-$env-K8S-Deploy")
+    id("PetClinic_${env}_K8S_Deploy")
     name = "K8S-$env Deploy"
 
     params {
