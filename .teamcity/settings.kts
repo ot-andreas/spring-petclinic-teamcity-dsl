@@ -37,15 +37,16 @@ version = "2020.1"
 
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
-    buildType(BuildAndTest)
-    buildType(OtplDeploy(Environment.CI_RS))
-    buildType(K8sDeploy(Environment.CI_RS))
-    buildType(K8sDeploy(Environment.PP_RS))
 
-    buildType(OtplDeploy(Environment.PP_RS))
+    sequence {
+        build(BuildAndTest)
+        build(OtplDeploy(Environment.CI_RS))
+        build(K8sDeploy(Environment.CI_RS))
+        build(K8sDeploy(Environment.PP_RS))
+        build(OtplDeploy(Environment.PP_RS))
 
-    buildType(OtplDeploy(Environment.PROD))
-
+        build(OtplDeploy(Environment.PROD))
+    }
 }
 
 object BuildAndTest : BuildType({
