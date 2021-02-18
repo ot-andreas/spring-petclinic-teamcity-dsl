@@ -40,11 +40,15 @@ project {
 
     sequence {
         build(BuildAndTest)
-        build(OtplDeploy(Environment.CI_RS))
-        build(K8sDeploy(Environment.CI_RS))
-        build(K8sDeploy(Environment.PP_RS))
-        build(OtplDeploy(Environment.PP_RS))
+        parallel {
+            build(OtplDeploy(Environment.CI_RS))
+            build(K8sDeploy(Environment.CI_RS))
+            build(K8sDeploy(Environment.PP_RS))
+            build(OtplDeploy(Environment.PP_RS))
+        }
+        // smoke test here
 
+        //potentially parallel with canary?
         build(OtplDeploy(Environment.PROD))
     }
 }
