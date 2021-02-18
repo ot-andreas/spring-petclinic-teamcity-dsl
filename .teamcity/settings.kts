@@ -160,7 +160,7 @@ object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
 })
 
 object OtherGit : GitVcsRoot({
-    name = "andreas-spring-petclinic-teamcity-dsl"
+    name = "andreas-spring-petclinic-vcs"
     url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
     authMethod = uploadedKey {
         uploadedKey = "guestcenter-tc"
