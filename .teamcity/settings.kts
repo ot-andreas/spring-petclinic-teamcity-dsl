@@ -42,12 +42,10 @@ project {
     sequence {
         build(BuildAndTest)
         parallel {
-            sequence {
-                build(OtplDeploy(Environment.CI_RS))
-                build(K8sDeploy(Environment.CI_RS))
-                build(K8sDeploy(Environment.PP_RS))
-                build(OtplDeploy(Environment.PP_RS))
-            }
+            build(OtplDeploy(Environment.CI_RS))
+            build(K8sDeploy(Environment.CI_RS))
+            build(K8sDeploy(Environment.PP_RS))
+            build(OtplDeploy(Environment.PP_RS))
         }
         // smoke test here
 
