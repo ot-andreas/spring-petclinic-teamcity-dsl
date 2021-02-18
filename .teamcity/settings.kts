@@ -142,27 +142,6 @@ class K8sDeploy(private val env: Environment) : BuildType({
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
-
-    steps {
-        step {
-            type = "K8sHelmDeployXXXX"
-        }
-    }
-//
-//    triggers {
-//        finishBuildTrigger {
-//            id = "TRIGGER_2786"
-//            buildType = "Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot"
-//            successfulOnly = true
-//        }
-//    }
-//
-//        dependencies {
-//            snapshot(AbsoluteId("Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot")) {
-//                onDependencyFailure = FailureAction.FAIL_TO_START
-//                synchronizeRevisions = false
-//            }
-//        }
 })
 
 object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
