@@ -59,7 +59,7 @@ object BuildAndTest : BuildType({
     name = "Build & Test"
 
     vcs {
-        root(AndreasSpringPetclinicTeamcityDsl)
+        root(OtherGit)
     }
 
     params {
@@ -146,6 +146,19 @@ class K8sDeploy(private val env: Environment) : BuildType({
 })
 
 object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
+    name = "andreas-spring-petclinic-teamcity-dsl"
+    url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
+    authMethod = uploadedKey {
+        uploadedKey = "guestcenter-tc"
+    }
+    branchSpec = """
+        +:refs/pull/*/merge
+        +:refs/heads/(master)
+        +:refs/heads/(feature*)
+    """.trimIndent()
+})
+
+object OtherGit : GitVcsRoot({
     name = "andreas-spring-petclinic-teamcity-dsl"
     url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
     authMethod = uploadedKey {
