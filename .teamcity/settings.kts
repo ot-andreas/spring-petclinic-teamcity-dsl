@@ -38,6 +38,7 @@ version = "2020.1"
 
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
+    vcsRoot(OtherGit)
 
     sequence {
         build(BuildAndTest)
