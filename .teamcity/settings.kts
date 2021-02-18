@@ -1,3 +1,4 @@
+import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
@@ -67,7 +68,7 @@ object BuildAndTest : BuildType({
 })
 
 class OtplDeploy(private val envName: String, private val env: String) : BuildType({
-    id("PetClinic_${env}_OTPL_Deploy")
+    id("PetClinic-$env-OTPL-Deploy".toExtId())
     name = "otpl deploy to $envName"
 
     vcs {
@@ -90,7 +91,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
         Environment.CI_RS -> "K8sDeploymentCentralCiRs"
         Environment.PP_RS -> "K8sDeploymentCentralPpRs"
     }))
-    id("PetClinic_${env}_K8S_Deploy")
+    id("PetClinic-$env-K8S-Deploy".toExtId())
     name = "K8S-$env Deploy"
 
     params {
