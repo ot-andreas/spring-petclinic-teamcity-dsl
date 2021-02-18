@@ -27,8 +27,10 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 'Debug' option is available in the context menu for the task.
 */
 
-enum class Environment {
-    CI_RS, PP_RS
+enum class Environment(val value: String) {
+    CI_RS("ci-rs"),
+    PP_RS("pp_rs"),
+    PROD("prod")
 }
 
 version = "2020.1"
@@ -36,11 +38,14 @@ version = "2020.1"
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
-    buildType(OtplDeploy("CI-RS", "ci-rs"))
+    buildType(OtplDeploy(Environment.CI_RS))
     buildType(K8sDeploy(Environment.CI_RS))
     buildType(K8sDeploy(Environment.PP_RS))
 
-    buildType(OtplDeploy("PP-RS", "pp-rs"))
+    buildType(OtplDeploy(Environment.PP_RS))
+
+    buildType(OtplDeploy(Environment.PROD))
+
 }
 
 object BuildAndTest : BuildType({
@@ -67,17 +72,17 @@ object BuildAndTest : BuildType({
     }
 })
 
-class OtplDeploy(private val envName: String, private val env: String) : BuildType({
-    id("PetClinic-$env-OTPL-Deploy".toExtId())
-    name = "otpl deploy to $envName"
+class OtplDeploy(private val env: Environment) : BuildType({
+    id("PetClinic-${env.name}-OTPL-Deploy".toExtId())
+    name = "OTPL deploy ${env.name}"
 
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
     steps {
         script {
-            name = "otpl deploy to $envName"
-            scriptContent = "otpl-deploy -u $env %otpl-build-tag%"
+            name = "OTPL deploy to ${env.name}"
+            scriptContent = "otpl-deploy -u ${env.value} %otpl-build-tag%"
 
             param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
             param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
@@ -90,8 +95,9 @@ class K8sDeploy(private val env: Environment) : BuildType({
     templates(AbsoluteId(when (env) {
         Environment.CI_RS -> "K8sDeploymentCentralCiRs"
         Environment.PP_RS -> "K8sDeploymentCentralPpRs"
+        Environment.PROD -> throw Exception("Not supported to deploy K8S for PROD")
     }))
-    id("PetClinic-$env-K8S-Deploy".toExtId())
+    id("PetClinic-K8S-$env-Deploy".toExtId())
     name = "K8S-$env Deploy"
 
     params {
