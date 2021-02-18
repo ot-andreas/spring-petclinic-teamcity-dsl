@@ -61,6 +61,12 @@ object BuildAndTest : BuildType({
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
+
+    params {
+        param("env.JAVA_HOME", "%env.JDK_11_x64%")
+        param("otpl-build-tag", "### This is set by otpl-configure-docker. ###")
+    }
+
     steps {
         maven {
             name = "Verify"
@@ -85,6 +91,14 @@ object BuildAndTest : BuildType({
         vcs {
         }
     }
+
+    requirements {
+        exists("env.maven32")
+        contains("teamcity.agent.jvm.os.name", "Linux")
+        exists("env.JDK_10_x64")
+        exists("env.TC_BUILD_AGENT")
+    }
+
 })
 
 class OtplDeploy(private val env: Environment) : BuildType({
@@ -94,10 +108,15 @@ class OtplDeploy(private val env: Environment) : BuildType({
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
     }
+
+    params {
+        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
+    }
+
     steps {
         script {
             name = "OTPL deploy to ${env.name}"
-            scriptContent = "otpl-deploy -u ${env.value} %otpl-build-tag%"
+            scriptContent = "otpl-deploy -u ${env.value} %image.tag%"
 
             param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
             param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
@@ -112,15 +131,12 @@ class K8sDeploy(private val env: Environment) : BuildType({
         Environment.PP_RS -> "K8sDeploymentCentralPpRs"
         Environment.PROD -> throw Exception("Not supported to deploy K8S for PROD")
     }))
+
     id("PetClinic_K8S_${env.name}_Deploy".toExtId())
     name = "K8S-$env Deploy"
 
     params {
-        text("image.tag",
-                "%dep.otpl-build-tag%",
-                display = ParameterDisplay.PROMPT,
-                allowEmpty = false
-        )
+        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
     }
 
     vcs {
