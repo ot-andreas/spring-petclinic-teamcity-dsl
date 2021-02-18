@@ -117,7 +117,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
 
     params {
         text("image.tag",
-                "%dep.Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot.otpl-build-tag%",
+                "%dep.otpl-build-tag%",
                 display = ParameterDisplay.PROMPT,
                 allowEmpty = false
         )
