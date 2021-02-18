@@ -37,7 +37,7 @@ enum class Environment(val value: String) {
 version = "2020.1"
 
 project {
-    vcsRoot(OtherGit)
+    vcsRoot(GitForBuildConfigurations)
 
     sequence {
         build(BuildAndTest)
@@ -59,7 +59,7 @@ object BuildAndTest : BuildType({
     name = "Build & Test"
 
     vcs {
-        root(OtherGit)
+        root(GitForBuildConfigurations)
     }
 
     params {
@@ -106,7 +106,7 @@ class OtplDeploy(private val env: Environment) : BuildType({
     name = "OTPL deploy ${env.name}"
 
     vcs {
-        root(OtherGit)
+        root(GitForBuildConfigurations)
     }
 
     params {
@@ -140,12 +140,12 @@ class K8sDeploy(private val env: Environment) : BuildType({
     }
 
     vcs {
-        root(OtherGit)
+        root(GitForBuildConfigurations)
 
     }
 })
 
-object OtherGit : GitVcsRoot({
+object GitForBuildConfigurations : GitVcsRoot({
     name = "andreas-spring-petclinic-vcs"
     url = "git@github.com:ot-andreas/spring-petclinic-teamcity-dsl.git"
     authMethod = uploadedKey {
