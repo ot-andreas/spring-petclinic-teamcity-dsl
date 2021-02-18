@@ -1,5 +1,6 @@
 import jetbrains.buildServer.configs.kotlin.v10.toExtId
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
+import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.MavenBuildStep
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
@@ -41,10 +42,12 @@ project {
     sequence {
         build(BuildAndTest)
         parallel {
-            build(OtplDeploy(Environment.CI_RS))
-            build(K8sDeploy(Environment.CI_RS))
-            build(K8sDeploy(Environment.PP_RS))
-            build(OtplDeploy(Environment.PP_RS))
+            sequence {
+                build(OtplDeploy(Environment.CI_RS))
+                build(K8sDeploy(Environment.CI_RS))
+                build(K8sDeploy(Environment.PP_RS))
+                build(OtplDeploy(Environment.PP_RS))
+            }
         }
         // smoke test here
 
@@ -54,6 +57,7 @@ project {
 }
 
 object BuildAndTest : BuildType({
+    id("PetClinic_Build_and_test".toExtId())
     name = "Build & Test"
 
     vcs {
@@ -68,6 +72,14 @@ object BuildAndTest : BuildType({
         maven {
             name = "Build Snapshot"
             goals = "clean deploy"
+
+            runnerArgs = "-Dotpl.docker.tag=%system.build.number% -U -e"
+            mavenVersion = auto()
+            userSettingsSelection = "arch-java-settings.xml"
+            localRepoScope = MavenBuildStep.RepositoryScope.MAVEN_DEFAULT
+            jdkHome = "%env.JDK_11_x64%"
+            jvmArgs = "-Xmx256m"
+            param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
         }
 
     }
@@ -78,7 +90,7 @@ object BuildAndTest : BuildType({
 })
 
 class OtplDeploy(private val env: Environment) : BuildType({
-    id("PetClinic-${env.name}-OTPL-Deploy".toExtId())
+    id("PetClinic_${env.name}_OTPL_Deploy".toExtId())
     name = "OTPL deploy ${env.name}"
 
     vcs {
@@ -102,7 +114,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
         Environment.PP_RS -> "K8sDeploymentCentralPpRs"
         Environment.PROD -> throw Exception("Not supported to deploy K8S for PROD")
     }))
-    id("PetClinic-K8S-$env-Deploy".toExtId())
+    id("PetClinic_K8S_${env.name}_Deploy".toExtId())
     name = "K8S-$env Deploy"
 
     params {
