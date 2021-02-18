@@ -1,14 +1,8 @@
-
 import jetbrains.buildServer.configs.kotlin.v2018_2.*
-//import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.Swabra
-//import jetbrains.buildServer.configs.kotlin.v2018_2.buildFeatures.swabra
-import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
-//import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
-
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -32,13 +26,18 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 'Debug' option is available in the context menu for the task.
 */
 
+enum class Environment {
+    CI_RS, PP_RS
+}
+
 version = "2020.1"
 
 project {
     vcsRoot(AndreasSpringPetclinicTeamcityDsl)
     buildType(BuildAndTest)
     buildType(OtplDeploy("CI-RS", "ci-rs"))
-
+    buildType(K8sDeploy(Environment.CI_RS))
+    buildType(K8sDeploy(Environment.PP_RS))
 
     buildType(OtplDeploy("PP-RS", "pp-rs"))
 }
@@ -67,8 +66,8 @@ object BuildAndTest : BuildType({
     }
 })
 
-
 class OtplDeploy(private val envName: String, private val env: String) : BuildType({
+    id("PetClinic-$env-OTPL-Deploy")
     name = "otpl deploy to $envName"
 
     vcs {
@@ -86,6 +85,47 @@ class OtplDeploy(private val envName: String, private val env: String) : BuildTy
     }
 })
 
+class K8sDeploy(private val env: Environment) : BuildType({
+    templates(AbsoluteId(when (env) {
+        Environment.CI_RS -> "K8sDeploymentCentralCiRs"
+        Environment.PP_RS -> "K8sDeploymentCentralPpRs"
+    }))
+    id("PetClinic-$env-K8S-Deploy")
+    name = "K8S-$env Deploy"
+
+    params {
+        text("image.tag",
+                "%dep.Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot.otpl-build-tag%",
+                display = ParameterDisplay.PROMPT,
+                allowEmpty = false
+        )
+    }
+
+    vcs {
+        root(AndreasSpringPetclinicTeamcityDsl)
+    }
+
+    steps {
+        step {
+            type = "K8sHelmDeploy"
+        }
+    }
+//
+//    triggers {
+//        finishBuildTrigger {
+//            id = "TRIGGER_2786"
+//            buildType = "Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot"
+//            successfulOnly = true
+//        }
+//    }
+//
+//        dependencies {
+//            snapshot(AbsoluteId("Umami_RestaurantLifeCycle_GcUsersManagementService_BuildSnapshot")) {
+//                onDependencyFailure = FailureAction.FAIL_TO_START
+//                synchronizeRevisions = false
+//            }
+//        }
+})
 
 object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     name = "andreas-spring-petclinic-teamcity-dsl"
