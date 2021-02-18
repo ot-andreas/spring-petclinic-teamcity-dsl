@@ -145,7 +145,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
 
     steps {
         step {
-            type = "K8sHelmDeploy"
+            type = "K8sHelmDeployXXXX"
         }
     }
 //
