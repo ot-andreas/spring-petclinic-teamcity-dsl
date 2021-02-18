@@ -141,6 +141,7 @@ class K8sDeploy(private val env: Environment) : BuildType({
 
     vcs {
         root(AndreasSpringPetclinicTeamcityDsl)
+
     }
 })
 
@@ -150,6 +151,7 @@ object AndreasSpringPetclinicTeamcityDsl : GitVcsRoot({
     authMethod = uploadedKey {
         uploadedKey = "guestcenter-tc"
     }
+    branchSpec = "+:refs/pull/*/merge"
 })
 
 //fun wrapWithFeature(buildType: BuildType, featureBlock: BuildFeatures.() -> Unit): BuildType {
