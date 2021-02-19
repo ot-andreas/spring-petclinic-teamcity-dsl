@@ -41,9 +41,9 @@ project {
     vcsRoot(GitForBuildConfigurations)
 
     sequence {
-        buildType(ScriptCommand("echo \"aaa\""))
-        buildType(ScriptCommand("echo \"bbb\""))
-        buildType(ScriptCommand("echo \"ccc\""))
+        build(ScriptCommand("echo \"aaa\""))
+        build(ScriptCommand("echo \"bbb\""))
+        build(ScriptCommand("echo \"ccc\""))
     }
 }
 
