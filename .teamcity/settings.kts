@@ -36,114 +36,147 @@ enum class Environment(val value: String) {
 
 version = "2020.1"
 
+
 project {
     vcsRoot(GitForBuildConfigurations)
 
     sequence {
-        build(BuildAndTest)
-        parallel {
-            build(OtplDeploy(Environment.CI_RS))
-            build(K8sDeploy(Environment.CI_RS))
-            build(K8sDeploy(Environment.PP_RS))
-            build(OtplDeploy(Environment.PP_RS))
-        }
-        // smoke test here
-
-        //potentially parallel with canary?
-        build(OtplDeploy(Environment.PROD))
+        buildType(ScriptCommand("echo \"aaa\""))
+        buildType(ScriptCommand("echo \"bbb\""))
+        buildType(ScriptCommand("echo \"ccc\""))
     }
 }
 
-object BuildAndTest : BuildType({
-    id("PetClinic_Build_and_test".toExtId())
-    name = "Build & Test"
+class ScriptCommand(private val command: String) : BuildType({
+
+    id("PetClinic_${command}".toExtId())
+    name = "Build & Test - ${command}"
 
     vcs {
         root(GitForBuildConfigurations)
     }
 
-    params {
-        param("env.JAVA_HOME", "%env.JDK_11_x64%")
-        param("otpl-build-tag", "### This is set by otpl-configure-docker. ###")
-    }
-
     steps {
-        maven {
-            name = "Verify"
-            goals = "clean verify"
+        script {
+            name = "$command"
+            scriptContent = "echo $command"
         }
-
-        maven {
-            name = "Build Snapshot"
-            goals = "clean deploy"
-
-            runnerArgs = "-Dotpl.docker.tag=%system.build.number% -U -e"
-            mavenVersion = auto()
-            userSettingsSelection = "arch-java-settings.xml"
-            localRepoScope = MavenBuildStep.RepositoryScope.MAVEN_DEFAULT
-            jdkHome = "%env.JDK_11_x64%"
-            jvmArgs = "-Xmx256m"
-            param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
-        }
-
     }
     triggers {
         vcs {
         }
     }
-
-    requirements {
-        exists("env.maven32")
-        contains("teamcity.agent.jvm.os.name", "Linux")
-        exists("env.JDK_10_x64")
-        exists("env.TC_BUILD_AGENT")
-    }
-
 })
 
-class OtplDeploy(private val env: Environment) : BuildType({
-    id("PetClinic_${env.name}_OTPL_Deploy".toExtId())
-    name = "OTPL deploy ${env.name}"
-
-    vcs {
-        root(GitForBuildConfigurations)
-    }
-
-    params {
-        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
-    }
-
-    steps {
-        script {
-            name = "OTPL deploy to ${env.name}"
-            scriptContent = "otpl-deploy -u ${env.value} %image.tag%"
-
-            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
-            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
-            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
-        }
-    }
-})
-
-class K8sDeploy(private val env: Environment) : BuildType({
-    templates(AbsoluteId(when (env) {
-        Environment.CI_RS -> "K8sDeploymentCentralCiRs"
-        Environment.PP_RS -> "K8sDeploymentCentralPpRs"
-        Environment.PROD -> throw Exception("Not supported to deploy K8S for PROD")
-    }))
-
-    id("PetClinic_K8S_${env.name}_Deploy".toExtId())
-    name = "K8S-$env Deploy"
-
-    params {
-        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
-    }
-
-    vcs {
-        root(GitForBuildConfigurations)
-
-    }
-})
+//
+//project {
+//    vcsRoot(GitForBuildConfigurations)
+//
+//    sequence {
+//        build(BuildAndTest)
+//        parallel {
+//            build(OtplDeploy(Environment.CI_RS))
+//            build(K8sDeploy(Environment.CI_RS))
+//            build(K8sDeploy(Environment.PP_RS))
+//            build(OtplDeploy(Environment.PP_RS))
+//        }
+//        // smoke test here
+//
+//        //potentially parallel with canary?
+//        build(OtplDeploy(Environment.PROD))
+//    }
+//}
+//
+//object BuildAndTest : BuildType({
+//    id("PetClinic_Build_and_test".toExtId())
+//    name = "Build & Test"
+//
+//    vcs {
+//        root(GitForBuildConfigurations)
+//    }
+//
+//    params {
+//        param("env.JAVA_HOME", "%env.JDK_11_x64%")
+//        param("otpl-build-tag", "### This is set by otpl-configure-docker. ###")
+//    }
+//
+//    steps {
+//        maven {
+//            name = "Verify"
+//            goals = "clean verify"
+//        }
+//
+//        maven {
+//            name = "Build Snapshot"
+//            goals = "clean deploy"
+//
+//            runnerArgs = "-Dotpl.docker.tag=%system.build.number% -U -e"
+//            mavenVersion = auto()
+//            userSettingsSelection = "arch-java-settings.xml"
+//            localRepoScope = MavenBuildStep.RepositoryScope.MAVEN_DEFAULT
+//            jdkHome = "%env.JDK_11_x64%"
+//            jvmArgs = "-Xmx256m"
+//            param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+//        }
+//
+//    }
+//    triggers {
+//        vcs {
+//        }
+//    }
+//
+//    requirements {
+//        exists("env.maven32")
+//        contains("teamcity.agent.jvm.os.name", "Linux")
+//        exists("env.JDK_10_x64")
+//        exists("env.TC_BUILD_AGENT")
+//    }
+//
+//})
+//
+//class OtplDeploy(private val env: Environment) : BuildType({
+//    id("PetClinic_${env.name}_OTPL_Deploy".toExtId())
+//    name = "OTPL deploy ${env.name}"
+//
+//    vcs {
+//        root(GitForBuildConfigurations)
+//    }
+//
+//    params {
+//        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
+//    }
+//
+//    steps {
+//        script {
+//            name = "OTPL deploy to ${env.name}"
+//            scriptContent = "otpl-deploy -u ${env.value} %image.tag%"
+//
+//            param("org.jfrog.artifactory.selectedDeployableServer.downloadSpecSource", "Job configuration")
+//            param("org.jfrog.artifactory.selectedDeployableServer.useSpecs", "false")
+//            param("org.jfrog.artifactory.selectedDeployableServer.uploadSpecSource", "Job configuration")
+//        }
+//    }
+//})
+//
+//class K8sDeploy(private val env: Environment) : BuildType({
+//    templates(AbsoluteId(when (env) {
+//        Environment.CI_RS -> "K8sDeploymentCentralCiRs"
+//        Environment.PP_RS -> "K8sDeploymentCentralPpRs"
+//        Environment.PROD -> throw Exception("Not supported to deploy K8S for PROD")
+//    }))
+//
+//    id("PetClinic_K8S_${env.name}_Deploy".toExtId())
+//    name = "K8S-$env Deploy"
+//
+//    params {
+//        text("image.tag", "${BuildAndTest.depParamRefs["otpl-build-tag"]}", display = ParameterDisplay.PROMPT, allowEmpty = false)
+//    }
+//
+//    vcs {
+//        root(GitForBuildConfigurations)
+//
+//    }
+//})
 
 object GitForBuildConfigurations : GitVcsRoot({
     name = "andreas-spring-petclinic-vcs"
